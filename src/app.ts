@@ -17,22 +17,22 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cors());
 
-// aplication level global error handler middleware
-const errorHandlerMiddleware = (
-  err: any,
+// controller attachment to the app object
+app.use("/users", UserController);
+
+// attach error middleware to express object
+app.use(function (
+  error: unknown,
   req: Request,
   res: Response,
   next: NextFunction
-) => {
-  logger.error(`------ Express request handler error: ${err} ---------- `);
-  res.status(500).json({ message: "Application server error" });
-};
-
-// attach error middleware to express object
-app.use(errorHandlerMiddleware);
-
-// controller attachment to the app object
-app.use("/users", UserController);
+) {
+  return res.status(500).send(error);
+});
+// handle any route that does not exists
+app.use(function (req: Request, res: Response) {
+  return res.status(404).send("The url path does not exist");
+});
 
 // application function runner before context post construct called
 (async function () {
@@ -40,7 +40,7 @@ app.use("/users", UserController);
   logger.info(
     `------------ Database connection established successfully -------------`
   );
-  await db.db_connection.sync({ alter: true });
+  await db.db_connection.sync({ force: true });
   logger.info(
     `------ Table DDL queries executed successfully ----------------`
   );
