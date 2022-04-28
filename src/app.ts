@@ -1,6 +1,7 @@
 import dotenv from "dotenv";
 dotenv.config();
 import express, { Application } from "express";
+import cors from "cors";
 
 // modules, helpers, configs and other custom files imports
 import { logger } from "./configs/logger";
@@ -12,6 +13,7 @@ const { port } = process.env;
 //express configurations
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(cors());
 
 // application function runner before context post construct called
 
